@@ -68,8 +68,11 @@ spec:
         volumeMounts:
         - name: confdir
           mountPath: /etc/aerospike
-        - name: datadir
-          mountPath: /opt/aerospike/data
+        volumeDevices:
+        - name: fast
+          devicePath: /dev/fast
+        - name: large
+          devicePath: /dev/large
         env:
         - name: NAMESPACE
           value: "$AEROSPIKE_NAMESPACE"
@@ -117,12 +120,21 @@ spec:
           name: aerospike-conf
   volumeClaimTemplates:
   - metadata:
-      name: datadir
-      labels: *AerospikeDeploymentLabels
+      name: fast
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: fast
+      volumeMode: Block
       resources:
         requests:
-          storage: ${AEROSPIKE_MEM}Gi
-      storageClassName: ssd
+          storage: 1Gi
+  - metadata:
+      name: large
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: large
+      volumeMode: Block
+      resources:
+        requests:
+          storage: 3Gi
 ---
